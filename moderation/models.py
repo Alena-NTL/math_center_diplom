@@ -15,7 +15,7 @@ class ModerationLog(models.Model):
         'tasks.Task',
         on_delete=models.CASCADE,
         related_name='moderation_logs',
-        verbose_name='Задача',
+        verbose_name='Задачу',
     )
     moderator = models.ForeignKey(
         settings.AUTH_USER_MODEL,

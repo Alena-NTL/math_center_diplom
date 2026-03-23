@@ -4,6 +4,7 @@ env/
 ENV/
 
 # База данных
+*.sqlite3
 *.db
 
 # Кэш Python
