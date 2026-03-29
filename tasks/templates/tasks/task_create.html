@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить задачу{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-plus-circle"></i> Добавить задачу</h2>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Тема *</label>
+                        {{ form.topic }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Сложность *</label>
+                        {{ form.difficulty }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Текст задачи *</label>
+                        {{ form.body }}
+                        <small class="form-text text-muted">
+                            LaTeX-формулы: <code>$x^2$</code>, <code>$\frac{a}{b}$</code>, <code>$\sqrt{2}$</code>
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ответ *</label>
+                        {{ form.answer }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Решение</label>
+                        {{ form.solution }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Изображения</label>
+                        <input type="file" name="images" class="form-control" multiple accept="image/*">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Сохранить
+                    </button>
+                    <a href="{% url 'tasks:list' %}" class="btn btn-outline-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Превью -->
+    <div class="col-md-5">
+        <div class="card sticky-top" style="top: 80px;">
+            <div class="card-header"><i class="bi bi-eye"></i> Предпросмотр</div>
+            <div class="card-body">
+                <div id="preview-body">
+                    <em class="text-muted">Введите текст задачи...</em>
+                </div>
+                <hr>
+                <strong>Ответ:</strong>
+                <div id="preview-answer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const bodyField = document.getElementById('id_body');
+    const answerField = document.getElementById('id_answer');
+    const previewBody = document.getElementById('preview-body');
+    const previewAnswer = document.getElementById('preview-answer');
+
+    let timeout;
+
+    function updatePreview() {
+        previewBody.innerHTML = bodyField.value.replace(/\n/g, '<br>') ||
+            '<em class="text-muted">Введите текст задачи...</em>';
+        previewAnswer.innerHTML = answerField.value.replace(/\n/g, '<br>');
+
+        if (window.MathJax) {
+            MathJax.typesetPromise([previewBody, previewAnswer]);
+        }
+    }
+
+    bodyField.addEventListener('input', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(updatePreview, 500);
+    });
+    answerField.addEventListener('input', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(updatePreview, 500);
+    });
+</script>
+{% endblock %}

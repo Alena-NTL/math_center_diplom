@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Задача #{{ task.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>Задача #{{ task.id }}</span>
+                {% if task.status == 'approved' %}
+                    <span class="badge bg-success">Одобрена</span>
+                {% elif task.status == 'on_review' %}
+                    <span class="badge bg-warning text-dark">На рассмотрении</span>
+                {% elif task.status == 'draft' %}
+                    <span class="badge bg-secondary">Черновик</span>
+                {% elif task.status == 'rejected' %}
+                    <span class="badge bg-danger">Отклонена</span>
+                {% elif task.status == 'revision' %}
+                    <span class="badge bg-info">На доработке</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="badge bg-info">{{ task.topic.subject }}</span>
+                    <span class="badge bg-secondary">{{ task.topic.grade }} кл.</span>
+                    <span class="badge bg-warning text-dark">{{ task.topic.name }}</span>
+                    <span class="badge bg-primary">{{ task.difficulty }}</span>
+                </div>
+
+                <h5>Условие:</h5>
+                <div class="p-3 bg-light rounded mb-3">
+                    {{ task.body|linebreaksbr }}
+                </div>
+
+                {% for img in images %}
+                    <img src="{{ img.image.url }}" class="img-fluid rounded mb-2"
+                         style="max-width: 400px;" alt="{{ img.caption }}">
+                {% endfor %}
+
+                <h5>Ответ:</h5>
+                <div class="p-3 bg-light rounded mb-3">
+                    {{ task.answer|linebreaksbr }}
+                </div>
+
+                {% if task.solution %}
+                    <h5>Решение:</h5>
+                    <div class="p-3 bg-light rounded">
+                        {{ task.solution|linebreaksbr }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="card-footer text-muted small">
+                Автор: {{ task.author.last_name }} {{ task.author.first_name }} |
+                {{ task.created_at|date:"d.m.Y H:i" }}
+            </div>
+        </div>
+
+        <!-- Лог модерации -->
+        {% if logs %}
+            <div class="card mt-3">
+                <div class="card-header">История модерации</div>
+                <div class="card-body">
+                    {% for log in logs %}
+                        <div class="mb-2 {% if not forloop.last %}border-bottom pb-2{% endif %}">
+                            <strong>{{ log.get_action_display }}</strong>
+                            — {{ log.moderator.last_name }} {{ log.moderator.first_name }}
+                            <small class="text-muted">({{ log.created_at|date:"d.m.Y H:i" }})</small>
+                            {% if log.comment %}
+                                <br><em class="text-muted">{{ log.comment }}</em>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Кнопки -->
+        <div class="mt-3">
+            {% if task.author == request.user or request.user.is_admin_role %}
+                <a href="{% url 'tasks:edit' task.pk %}" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil"></i> Редактировать
+                </a>
+            {% endif %}
+
+            {% if task.author == request.user %}
+                {% if task.status == 'draft' or task.status == 'revision' or task.status == 'rejected' %}
+                    <form method="POST" action="{% url 'tasks:submit' task.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-send"></i> На модерацию
+                        </button>
+                    </form>
+                {% endif %}
+            {% endif %}
+
+            <a href="{% url 'tasks:list' %}" class="btn btn-outline-secondary">← К списку</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

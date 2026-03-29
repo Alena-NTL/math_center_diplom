@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование задачи #{{ task.id }}{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-pencil"></i> Редактирование задачи #{{ task.id }}</h2>
+
+<div class="card" style="max-width: 700px;">
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">Тема</label>
+                {{ form.topic }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Сложность</label>
+                {{ form.difficulty }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Текст задачи</label>
+                {{ form.body }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Ответ</label>
+                {{ form.answer }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Решение</label>
+                {{ form.solution }}
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Сохранить
+            </button>
+            <a href="{% url 'tasks:detail' task.pk %}" class="btn btn-outline-secondary">Отмена</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

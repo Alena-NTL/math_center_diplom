@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Модерация — задача #{{ task.id }}{% endblock %}
+
+{% block content %}
+<h2>Рассмотрение задачи #{{ task.id }}</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="badge bg-info">{{ task.topic.subject }}</span>
+                    <span class="badge bg-secondary">{{ task.topic.grade }} кл.</span>
+                    <span class="badge bg-warning text-dark">{{ task.topic.name }}</span>
+                    <span class="badge bg-primary">{{ task.difficulty }}</span>
+                </div>
+
+                <h5>Условие:</h5>
+                <div class="p-3 bg-light rounded mb-3">{{ task.body|linebreaksbr }}</div>
+
+                <h5>Ответ:</h5>
+                <div class="p-3 bg-light rounded mb-3">{{ task.answer|linebreaksbr }}</div>
+
+                {% if task.solution %}
+                    <h5>Решение:</h5>
+                    <div class="p-3 bg-light rounded">{{ task.solution|linebreaksbr }}</div>
+                {% endif %}
+            </div>
+            <div class="card-footer text-muted small">
+                Автор: {{ task.author.last_name }} {{ task.author.first_name }}
+            </div>
+        </div>
+
+        {% if logs %}
+            <div class="card mt-3">
+                <div class="card-header">История</div>
+                <div class="card-body">
+                    {% for log in logs %}
+                        <div class="mb-2">
+                            <strong>{{ log.get_action_display }}</strong>
+                            — {{ log.moderator.last_name }}
+                            <small class="text-muted">({{ log.created_at|date:"d.m.Y H:i" }})</small>
+                            {% if log.comment %}<br><em>{{ log.comment }}</em>{% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="card sticky-top" style="top: 80px;">
+            <div class="card-header bg-primary text-white">Решение</div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Комментарий</label>
+                        <textarea name="comment" class="form-control" rows="4"
+                                  placeholder="Обязателен при возврате на доработку"></textarea>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" name="action" value="approve" class="btn btn-success">
+                            <i class="bi bi-check-lg"></i> Одобрить
+                        </button>
+                        <button type="submit" name="action" value="revision" class="btn btn-warning">
+                            <i class="bi bi-arrow-return-left"></i> На доработку
+                        </button>
+                        <button type="submit" name="action" value="reject" class="btn btn-danger">
+                            <i class="bi bi-x-lg"></i> Отклонить
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
