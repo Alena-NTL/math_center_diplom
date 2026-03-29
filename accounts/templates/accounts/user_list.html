@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Пользователи{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-people"></i> Пользователи</h2>
+    <a href="{% url 'accounts:user_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus"></i> Добавить
+    </a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ФИО</th>
+            <th>Логин</th>
+            <th>Роль</th>
+            <th>Активен</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for u in users %}
+            <tr>
+                <td>{{ u.last_name }} {{ u.first_name }}</td>
+                <td>{{ u.username }}</td>
+                <td>
+                    {% if u.role == 'admin' %}
+                        <span class="badge bg-danger">Администратор</span>
+                    {% else %}
+                        <span class="badge bg-primary">Преподаватель</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if u.is_active %}
+                        <span class="text-success">✓</span>
+                    {% else %}
+                        <span class="text-danger">✗</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
