@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<h2>Добро пожаловать, {{ request.user.first_name }}!</h2>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body text-center">
+                <h2>{{ total_approved }}</h2>
+                <p class="mb-0">Задач в банке</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body text-center">
+                <h2>{{ my_tasks }}</h2>
+                <p class="mb-0">Моих задач</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body text-center">
+                <h2>{{ my_assignments }}</h2>
+                <p class="mb-0">Моих ДЗ</p>
+            </div>
+        </div>
+    </div>
+    {% if request.user.is_admin_role %}
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body text-center">
+                <h2>{{ on_review }}</h2>
+                <p class="mb-0">На модерации</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Быстрые действия -->
+<div class="card mb-4">
+    <div class="card-header">Быстрые действия</div>
+    <div class="card-body">
+        <a href="{% url 'tasks:create' %}" class="btn btn-primary me-2">
+            <i class="bi bi-plus-circle"></i> Добавить задачу
+        </a>
+        <a href="{% url 'assignments:create' %}" class="btn btn-success me-2">
+            <i class="bi bi-file-earmark-pdf"></i> Создать ДЗ
+        </a>
+        <a href="{% url 'tasks:list' %}" class="btn btn-outline-primary">
+            <i class="bi bi-search"></i> Банк задач
+        </a>
+        {% if request.user.is_admin_role and on_review > 0 %}
+            <a href="{% url 'moderation:queue' %}" class="btn btn-warning">
+                <i class="bi bi-shield-check"></i> Модерация ({{ on_review }})
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Последние задачи -->
+<div class="card">
+    <div class="card-header">Мои последние задачи</div>
+    <div class="list-group list-group-flush">
+        {% for task in my_recent %}
+            <a href="{% url 'tasks:detail' task.pk %}"
+               class="list-group-item list-group-item-action d-flex justify-content-between">
+                <span>{{ task.body|truncatewords:15 }}</span>
+                {% if task.status == 'approved' %}
+                    <span class="badge bg-success">✓</span>
+                {% elif task.status == 'on_review' %}
+                    <span class="badge bg-warning">⏳</span>
+                {% elif task.status == 'draft' %}
+                    <span class="badge bg-secondary">📝</span>
+                {% endif %}
+            </a>
+        {% empty %}
+            <div class="list-group-item text-muted">Задач пока нет</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

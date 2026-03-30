@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Создать ДЗ{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-file-earmark-pdf"></i> Создать домашнее задание</h2>
+
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i>
+    Одобренных задач в банке: <strong>{{ approved_count }}</strong>
+</div>
+
+<div class="card" style="max-width: 600px;">
+    <div class="card-header">Параметры генерации</div>
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">Предмет *</label>
+                {{ form.subject }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Класс *</label>
+                {{ form.grade }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Сложность</label>
+                {{ form.difficulty }}
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Задач в варианте *</label>
+                    {{ form.tasks_per_variant }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Кол-во вариантов *</label>
+                    {{ form.num_variants }}
+                </div>
+            </div>
+            <div class="mb-3 form-check">
+                {{ form.include_answers }}
+                <label class="form-check-label">Включить ответы в PDF</label>
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-lightning"></i> Сгенерировать
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
